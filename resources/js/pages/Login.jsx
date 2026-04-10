@@ -1,4 +1,4 @@
-import logo from '@/assets/logo.svg';
+import logo from '@/assets/Logo.svg';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
