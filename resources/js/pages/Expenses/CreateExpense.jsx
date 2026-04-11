@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 export default function CreateExpense({ token, onSuccess, onClose }) {
   const [formData, setFormData] = useState({
@@ -44,80 +44,71 @@ export default function CreateExpense({ token, onSuccess, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+    <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex justify-center items-center z-50">
+      <div className="font-verdana p-6 max-w-md w-full bg-white rounded shadow-md relative">
+
+        {/* Close Button */}
+        <button
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold"
+          onClick={onClose}
+        >
+          ✖
+        </button>
+
         <h2 className="text-xl font-bold mb-4">Add New Expense</h2>
-        {message && <p className="mb-4 text-center">{message}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1">Description</label>
-            <input
-              type="text"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-              className="w-full border px-3 py-2 rounded"
-            />
-          </div>
-          <div>
-            <label className="block mb-1">Date</label>
-            <input
-              type="date"
-              name="exp_date"
-              value={formData.exp_date}
-              onChange={handleChange}
-              required
-              className="w-full border px-3 py-2 rounded"
-            />
-          </div>
-        <div>
-        <label className="block mb-1">Type</label>
-        <select
+        {message && <p className="text-green-600 mb-3 text-center">{message}</p>}
+
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-3">
+          <input
+            type="text"
+            name="description"
+            placeholder="Description"
+            value={formData.description}
+            onChange={handleChange}
+            className="px-3 py-2 border rounded"
+            required
+          />
+          <input
+            type="date"
+            name="exp_date"
+            value={formData.exp_date}
+            onChange={handleChange}
+            className="px-3 py-2 border rounded"
+            required
+          />
+          <select
             name="exp_type"
             value={formData.exp_type}
             onChange={handleChange}
+            className="px-3 py-2 border rounded"
             required
-            className="w-full border px-3 py-2 rounded"
-        >
-            <option value="">Select type</option>
+          >
+            <option value="">Select Type</option>
             <option value="Utilities">Utilities</option>
             <option value="Rent">Rent</option>
             <option value="Equipment">Equipment</option>
             <option value="Maintenance">Maintenance</option>
             <option value="Supplies">Supplies</option>
             <option value="Other">Other</option>
-        </select>
-        </div>
-          <div>
-            <label className="block mb-1">Amount</label>
-            <input
-              type="number"
-              name="exp_amount"
-              value={formData.exp_amount}
-              onChange={handleChange}
-              required
-              className="w-full border px-3 py-2 rounded"
-            />
-          </div>
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-                onClick={onClose}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Create
-            </button>
-          </div>
+          </select>
+          <input
+            type="number"
+            name="exp_amount"
+            placeholder="Amount"
+            value={formData.exp_amount}
+            onChange={handleChange}
+            className="px-3 py-2 border rounded"
+            required
+          />
+
+          <button
+            type="submit"
+            className="bg-[#03023B] text-white py-2 rounded hover:text-black hover:bg-[#FFDE59] transition"
+          >
+            Create Expense
+          </button>
         </form>
       </div>
     </div>
   );
 }
-    
