@@ -4,12 +4,12 @@ import Sidebar from './Sidebar';
 
 export default function Layout({ user, onLogout }) {
   return (
-    <>
+    <div className="min-h-screen lg:flex">
       <Sidebar user={user} onLogout={onLogout} />
 
-      <div className="flex-1 ml-[220px] min-h-screen p-6 bg-gray-50">
+      <main className="flex-1 w-full min-h-screen p-6 pt-20 lg:pt-6">
         <Outlet />
-      </div>
-    </>
+      </main>
+    </div>
   );
 }
