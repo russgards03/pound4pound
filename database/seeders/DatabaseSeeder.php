@@ -19,12 +19,12 @@ class DatabaseSeeder extends Seeder
     {
         // Users
         User::create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => Hash::make('password123'), 
+            'name' => 'Admin',
+            'email' => 'admin@p4p.com',
+            'password' => Hash::make('p0und4P0und*'), 
         ]);
 
-        $users = [
+        /*$users = [
             ['name' => 'Lij Faeldonea', 'email' => 'lij@gmail.com', 'password' => 'lij123'],
             ['name' => 'KJR Calampinay', 'email' => 'kjr@gmail.com', 'password' => 'kjr123'],
             ['name' => 'Russ Garde', 'email' => 'russgarde03@gmail.com', 'password' => 'russ123'],
@@ -78,6 +78,6 @@ class DatabaseSeeder extends Seeder
                 'max_slots' => null,
                 'is_active' => true,
             ]);
-        }
+        }*/
     }
 }
