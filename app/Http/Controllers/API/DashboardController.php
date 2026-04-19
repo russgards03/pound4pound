@@ -162,16 +162,28 @@ class DashboardController extends Controller
         $annualRevenue = Payment::whereBetween('payment_date', [$startOfYear, $now])
             ->sum('amount');
 
+        $monthlyExpenses = Expense::whereBetween('exp_date', [$startOfMonth, $endOfMonth])
+            ->sum('exp_amount');
+
+        $annualExpenses = Expense::whereBetween('exp_date', [$startOfYear, $now])
+            ->sum('exp_amount');
+
+        $activeTrainingSubscriptions = TrainingSubscription::where('status', 'active')->count();
+
         return [
             'members' => [
                 'total_active'   => $totalActive,
                 'annual'         => $annualMembers,
                 'walk_in'        => $walkInMembers,
                 'new_this_month' => $newMembersThisMonth,
+                'active_training_subscriptions' => $activeTrainingSubscriptions,
             ],
             'revenue' => [
-                'monthly_total' => (float) $monthlyRevenue,
-                'annual_total'  => (float) $annualRevenue,
+                'monthly_total'    => (float) $monthlyRevenue,
+                'annual_total'     => (float) $annualRevenue,
+                'monthly_expenses' => (float) $monthlyExpenses,
+                'annual_expenses'  => (float) $annualExpenses,
+                'annual_balance'   => (float) ($annualRevenue - $annualExpenses),
             ]
         ];
     }
@@ -179,10 +191,19 @@ class DashboardController extends Controller
     public function exportFullReport()
     {
         $dashboardStats = $this->getDashboardData();
-        $members        = Member::all();
+        $members        = Member::with('membership')
+            ->withCount('trainingSubscriptions')
+            ->get();
+        $expenses = Expense::orderBy('exp_date', 'desc')->get();
+        $payments = Payment::with('member')
+            ->orderBy('payment_date', 'desc')
+            ->get();
+        $trainingSubscriptions = TrainingSubscription::with(['member', 'plan'])
+            ->orderBy('end_date', 'desc')
+            ->get();
 
         return Excel::download(
-            new GymReportExport($dashboardStats, $members),
+            new GymReportExport($dashboardStats, $members, $expenses, $payments, $trainingSubscriptions),
             'gym_report.xlsx'
         );
     }

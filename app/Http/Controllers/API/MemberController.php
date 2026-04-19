@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Models\Payment;
 use App\Models\WalkIn;
+use App\Models\Expense;
+use App\Models\TrainingSubscription;
 use App\Exports\GymReportExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
@@ -130,7 +132,9 @@ class MemberController extends Controller
     public function exportReport()
     {
         $now     = Carbon::now();
-        $members = Member::all();
+        $members = Member::with('membership')
+            ->withCount('trainingSubscriptions')
+            ->get();
 
         $monthlyRevenue = Payment::whereMonth('payment_date', $now->month)
             ->whereYear('payment_date', $now->year)
@@ -139,21 +143,40 @@ class MemberController extends Controller
         $annualRevenue = Payment::whereYear('payment_date', $now->year)
             ->sum('amount');
 
+        $monthlyExpenses = Expense::whereMonth('exp_date', $now->month)
+            ->whereYear('exp_date', $now->year)
+            ->sum('exp_amount');
+
+        $annualExpenses = Expense::whereYear('exp_date', $now->year)
+            ->sum('exp_amount');
+
         $dashboardStats = [
             'members' => [
                 'total_active'   => Member::where('status', 'Active')->count(),
                 'new_this_month' => Member::whereMonth('created_at', $now->month)
                                           ->whereYear('created_at', $now->year)
                                           ->count(),
+                'active_training_subscriptions' => TrainingSubscription::where('status', 'active')->count(),
             ],
             'revenue' => [
-                'monthly_total' => $monthlyRevenue,
-                'annual_total'  => $annualRevenue,
+                'monthly_total'    => $monthlyRevenue,
+                'annual_total'     => $annualRevenue,
+                'monthly_expenses' => $monthlyExpenses,
+                'annual_expenses'  => $annualExpenses,
+                'annual_balance'   => $annualRevenue - $annualExpenses,
             ],
         ];
 
+        $expenses = Expense::orderBy('exp_date', 'desc')->get();
+        $payments = Payment::with('member')
+            ->orderBy('payment_date', 'desc')
+            ->get();
+        $trainingSubscriptions = TrainingSubscription::with(['member', 'plan'])
+            ->orderBy('end_date', 'desc')
+            ->get();
+
         return Excel::download(
-            new GymReportExport($dashboardStats, $members),
+            new GymReportExport($dashboardStats, $members, $expenses, $payments, $trainingSubscriptions),
             'gym_report.xlsx'
         );
     }
