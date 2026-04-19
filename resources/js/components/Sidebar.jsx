@@ -23,7 +23,7 @@ export default function Sidebar({ user, onLogout }) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-[220px] bg-[#03023B] p-5 transition-transform duration-300 ease-in-out
+        className={`fixed inset-y-0 left-0 z-40 w-[220px] bg-[#03023B] p-5 transition-transform duration-300 ease-in-out overflow-y-auto
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:static lg:block`}
       >
         <SidebarMenu onLogout={onLogout} onClose={closeMobileMenu} />
