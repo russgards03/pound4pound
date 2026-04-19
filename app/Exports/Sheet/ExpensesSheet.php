@@ -17,7 +17,7 @@ class ExpensesSheet implements FromArray, WithTitle
     public function array(): array
     {
         $rows = [
-            ['ID', 'Date', 'Type', 'Description', 'Amount'],
+            ['ID', 'Date', 'Type', 'Amount'],
         ];
 
         foreach ($this->expenses as $expense) {
@@ -25,7 +25,6 @@ class ExpensesSheet implements FromArray, WithTitle
                 $expense->id,
                 $expense->exp_date?->format('Y-m-d') ?? '',
                 $expense->exp_type,
-                $expense->description,
                 $expense->exp_amount,
             ];
         }
