@@ -31,9 +31,8 @@ class Plan extends Model
     'max_slots' => 'integer',
     ];
 
-    public function program()
-    {
-        return $this->belongsTo(Program::class);
+    public function programs() {
+        return $this->belongsToMany(Program::class);
     }
 
     public function trainingSubscriptions()

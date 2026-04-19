@@ -38,7 +38,7 @@ class MemberController extends Controller
     {
         $member->load([
             'membership',
-            'trainingSubscriptions.plan.program',
+            'trainingSubscriptions.plan.programs',
         ]);
 
         // Fetch walk-ins for this member

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable from '../../components/DataTable';
 import CreateTrainingSubs from './CreateTrainingSubs';
 import white_circle from '@/assets/plus-circle-white.svg';
 import black_circle from '@/assets/plus-circle-black.svg';
 
 export default function TrainingSubs() {
+  const navigate = useNavigate();
   const [subscriptions, setSubscriptions] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
@@ -32,7 +34,8 @@ export default function TrainingSubs() {
   ];
 
   const tableData = subscriptions.map(sub => ({
-    id: sub.id, 
+    id: sub.id,
+    member_id: sub.member?.id,
     member_name: sub.member ? `${sub.member.first_name} ${sub.member.last_name}` : 'Deleted Member',
     plan_name: sub.plan?.name || '-',
     start_date: sub.start_date || '-',
@@ -75,10 +78,11 @@ export default function TrainingSubs() {
       )}
 
       <DataTable
-        data={tableData}
-        columns={columns}
-        itemsPerPage={10}
-      />
+      data={tableData}
+      columns={columns}
+      itemsPerPage={10}
+      onRowClick={(row) => navigate(`/members/${row.member_id}`)}
+    />
     </div>
   );
 }

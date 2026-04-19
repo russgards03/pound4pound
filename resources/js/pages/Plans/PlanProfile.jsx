@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 export default function PlanProfile({ plan, token, onSuccess, onClose }) {
   const [formData, setFormData] = useState({
-    program_id: "",
+    program_ids: [],
     name: "",
     duration_days: "",
     price: "",
@@ -20,16 +20,16 @@ export default function PlanProfile({ plan, token, onSuccess, onClose }) {
   useEffect(() => {
     if (plan) {
       setFormData({
-        program_id: plan.program_id,
+        program_ids: plan.programs ? plan.programs.map((p) => p.id) : [],
         name: plan.name,
         duration_days: plan.duration_days,
         price: plan.price,
         is_promo: plan.is_promo,
         promo_start_date: plan.promo_start_date
-          ? plan.promo_start_date.split('T')[0]
+          ? plan.promo_start_date.split("T")[0]
           : "",
         promo_end_date: plan.promo_end_date
-          ? plan.promo_end_date.split('T')[0]
+          ? plan.promo_end_date.split("T")[0]
           : "",
         max_slots: plan.max_slots || "",
         is_active: plan.is_active,
@@ -37,15 +37,15 @@ export default function PlanProfile({ plan, token, onSuccess, onClose }) {
     }
   }, [plan]);
 
-  // Fetch subscribers for this plan
+  // Fetch subscribers
   useEffect(() => {
     if (plan?.id) {
       fetch(`/api/plans/${plan.id}/subscriptions`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then(res => res.json())
-        .then(data => setSubscribers(data.data || []))
-        .catch(err => console.error(err));
+        .then((res) => res.json())
+        .then((data) => setSubscribers(data.data || []))
+        .catch((err) => console.error(err));
     }
   }, [plan, token]);
 
@@ -65,9 +65,23 @@ export default function PlanProfile({ plan, token, onSuccess, onClose }) {
     }));
   };
 
+  const handleProgramToggle = (id) => {
+    setFormData((prev) => ({
+      ...prev,
+      program_ids: prev.program_ids.includes(id)
+        ? prev.program_ids.filter((p) => p !== id)
+        : [...prev.program_ids, id],
+    }));
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
     setMessage("");
+
+    if (formData.program_ids.length === 0) {
+      setMessage("Please select at least one program.");
+      return;
+    }
 
     try {
       const payload = {
@@ -127,8 +141,8 @@ export default function PlanProfile({ plan, token, onSuccess, onClose }) {
   };
 
   const statusColors = {
-    active: 'bg-emerald-100 text-emerald-700',
-    expired: 'bg-rose-100 text-rose-700',
+    active: "bg-emerald-100 text-emerald-700",
+    expired: "bg-rose-100 text-rose-700",
   };
 
   return (
@@ -136,7 +150,7 @@ export default function PlanProfile({ plan, token, onSuccess, onClose }) {
       <div className="flex gap-4 w-full max-w-3xl px-4">
 
         {/* Edit Plan Modal */}
-        <div className="bg-white rounded-lg w-full max-w-md p-6 relative shadow-lg">
+        <div className="bg-white rounded-lg w-full max-w-md p-6 relative shadow-lg overflow-y-auto max-h-[90vh]">
           <button
             className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold"
             onClick={onClose}
@@ -146,26 +160,29 @@ export default function PlanProfile({ plan, token, onSuccess, onClose }) {
 
           <h2 className="text-xl font-bold mb-4">Edit Plan</h2>
           {message && (
-            <p className={`mb-3 text-center ${message.includes('successfully') ? 'text-green-600' : 'text-red-500'}`}>
+            <p className={`mb-3 text-center ${message.includes("successfully") ? "text-green-600" : "text-red-500"}`}>
               {message}
             </p>
           )}
 
           <form onSubmit={handleUpdate} className="flex flex-col space-y-3">
-            <select
-              name="program_id"
-              value={formData.program_id}
-              onChange={handleChange}
-              className="px-3 py-2 border rounded"
-              required
-            >
-              <option value="">Select Program</option>
-              {programs.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
+
+            {/* Program checkboxes */}
+            <div className="border rounded px-3 py-2">
+              <p className="text-sm font-medium mb-2 text-gray-600">Programs</p>
+              <div className="flex flex-col gap-1 max-h-36 overflow-y-auto">
+                {programs.map((p) => (
+                  <label key={p.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.program_ids.includes(p.id)}
+                      onChange={() => handleProgramToggle(p.id)}
+                    />
+                    {p.name}
+                  </label>
+                ))}
+              </div>
+            </div>
 
             <input
               type="text"
@@ -276,13 +293,13 @@ export default function PlanProfile({ plan, token, onSuccess, onClose }) {
             <p className="text-gray-400 text-sm mt-4 text-center">No subscribers yet.</p>
           ) : (
             <div className="flex flex-col gap-2 overflow-y-auto max-h-96">
-              {subscribers.map(sub => (
+              {subscribers.map((sub) => (
                 <div key={sub.id} className="border rounded p-3 text-sm">
                   <p className="font-medium">{sub.member_name}</p>
                   <p className="text-gray-500">
                     {sub.start_date} → {sub.end_date}
                   </p>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[sub.status] || 'bg-gray-100 text-gray-600'}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[sub.status] || "bg-gray-100 text-gray-600"}`}>
                     {sub.status}
                   </span>
                 </div>
@@ -290,7 +307,6 @@ export default function PlanProfile({ plan, token, onSuccess, onClose }) {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

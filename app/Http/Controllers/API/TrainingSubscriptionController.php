@@ -13,7 +13,7 @@ class TrainingSubscriptionController extends Controller
 {
     public function index()
     {
-        $subscriptions = TrainingSubscription::with(['member', 'plan.program'])
+        $subscriptions = TrainingSubscription::with(['member', 'plan.programs'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(fn($sub) => $this->format($sub));
@@ -121,6 +121,7 @@ class TrainingSubscriptionController extends Controller
         return [
             'id'         => $sub->id,
             'member'     => $sub->member ? [
+                'id'         => $sub->member->id,
                 'first_name' => $sub->member->first_name,
                 'last_name'  => $sub->member->last_name,
             ] : null,
