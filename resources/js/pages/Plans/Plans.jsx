@@ -117,12 +117,13 @@ export default function Plans({ user }) {
         <DataTable
           data={plans.map(plan => ({
             ...plan,
-            program_name: plan.program?.name || 'N/A',
+            // Changed: join all program names instead of plan.program?.name
+            program_name: plan.programs?.map(p => p.name).join(', ') || 'N/A',
             duration: `${plan.duration_days} days`,
             price: plan.price.toFixed(2),
             is_promo: plan.is_promo === true || plan.is_promo === 1 || plan.is_promo === "1",
             is_active: plan.is_active ? 'Active' : 'Inactive',
-            subscribed_count: plan.training_subscriptions_count ?? 0,  // add this
+            subscribed_count: plan.training_subscriptions_count ?? 0,
             promo_start_date: plan.promo_start_date,
             promo_start_date_display: plan.promo_start_date ? new Date(plan.promo_start_date).toLocaleDateString() : "-",
             promo_end_date: plan.promo_end_date,
@@ -132,8 +133,10 @@ export default function Plans({ user }) {
           itemsPerPage={10}
           onRowClick={(row) => setSelectedPlan({
             ...row,
-            is_active: row.is_active === 'Active', 
-            is_promo: !!row.is_promo,              
+            // Changed: pass programs array through so PlanProfile can read it
+            programs: row.programs || [],
+            is_active: row.is_active === 'Active',
+            is_promo: !!row.is_promo,
           })}
         />
       </main>

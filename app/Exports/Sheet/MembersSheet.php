@@ -17,7 +17,7 @@ class MembersSheet implements FromArray, WithTitle
     public function array(): array
     {
         $rows = [
-            ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Status']
+            ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Status', 'Joined At', 'Membership Type', 'Membership Start', 'Membership End', 'Training Subscriptions']
         ];
 
         foreach ($this->members as $m) {
@@ -28,6 +28,11 @@ class MembersSheet implements FromArray, WithTitle
                 $m->email,
                 $m->phone,
                 $m->status,
+                $m->created_at?->format('Y-m-d') ?? '',
+                $m->membership?->type ?? 'None',
+                $m->membership?->start_date?->format('Y-m-d') ?? '',
+                $m->membership?->end_date?->format('Y-m-d') ?? '',
+                $m->training_subscriptions_count ?? ($m->trainingSubscriptions ? $m->trainingSubscriptions->count() : 0),
             ];
         }
 
