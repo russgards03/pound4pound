@@ -28,3 +28,4 @@ A gym management system built with **Laravel** that allows administrators to man
    ```bash
    git clone https://github.com/russgards03/pound4pound.git
    cd pound4pound
+   docker compose up -d
